@@ -115,6 +115,20 @@ thead th { background: var(--subtle); color: var(--muted); font-size: 12px; font
 .deal p { font-size: 12px; }
 .deal strong { display: block; margin: var(--space-2) 0; }
 .deal select, .fields input, .fields select { width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: var(--space-2); }
+.deal select, .fields select {
+  appearance: none;
+  padding-inline-end: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='m4 6 4 4 4-4' stroke='%2358647c' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+[data-theme="dark"] :is(.deal, .fields) select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='m4 6 4 4 4-4' stroke='%23aeb8ce' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+@media (forced-colors: active) {
+  :root :is(.deal, .fields) select { appearance: auto; background-image: none; }
+}
 .deal select { font-size: 12px; }
 .empty { color: var(--muted); padding: var(--space-3) 0; }
 td.empty { padding-inline: var(--space-5); }
