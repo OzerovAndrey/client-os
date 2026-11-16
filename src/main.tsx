@@ -41,6 +41,7 @@ function App() {
   const [screen, setScreen] = useState<Screen>('Overview')
   const [menu, setMenu] = useState(false)
   const BrandMark = brandMarks[workspace.id]
+  const avatarUrl = import.meta.env.BASE_URL + `avatars/${workspace.id}.jpg`
 
   useEffect(() => {
     document.documentElement.dataset.brand = workspace.id
@@ -58,7 +59,7 @@ function App() {
           <Icon size={18} />{name}
         </button>)}
       </nav>
-      <div className="profile"><img className="profile-avatar" src={import.meta.env.BASE_URL + `avatars/${workspace.id}.jpg`} alt="" width={36} height={36} /><div><strong>Alex Morgan</strong><small>Demo workspace</small></div></div>
+      <div className="profile"><img className="profile-avatar" src={avatarUrl} alt="" width={36} height={36} /><div><strong>Alex Morgan</strong><small>Demo workspace</small></div></div>
     </aside>
     <div className="body">
       <header className="topbar">
@@ -71,7 +72,7 @@ function App() {
       <WorkspaceView key={workspace.id} workspace={workspace} screen={screen} navigate={setScreen} />
     </div>
     <label className="workspace-select">
-      <span className="workspace-avatar">{workspace.initials}</span>
+      <img className="workspace-avatar" src={avatarUrl} alt="" width={36} height={36} />
       <span className="workspace-caption">Demo brand</span>
       <span className="workspace-name" aria-hidden="true">{workspace.name}</span>
       <select aria-label="Workspace" value={workspace.id} onChange={event => {

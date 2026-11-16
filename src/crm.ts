@@ -1,7 +1,7 @@
 export const workspaces = [
-  { id: 'atlas', name: 'Atlas Partners', initials: 'AP' },
-  { id: 'studio', name: 'Studio North', initials: 'SN' },
-  { id: 'meridian', name: 'Meridian Capital', initials: 'MC' },
+  { id: 'atlas', name: 'Atlas Partners' },
+  { id: 'studio', name: 'Studio North' },
+  { id: 'meridian', name: 'Meridian Capital' },
 ] as const
 
 export type Workspace = typeof workspaces[number]

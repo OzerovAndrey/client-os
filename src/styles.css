@@ -25,7 +25,7 @@ h2 { font-size: 16px; letter-spacing: .005em; }
 .sidebar { position: sticky; top: var(--space-8); height: calc(100dvh - 5rem); min-height: min(450px, calc(100dvh - 5rem)); overflow: auto; background: var(--navigation); border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: var(--space-5); gap: var(--space-8); }
 .product, .profile, .workspace-select, .sidebar button, .topbar, .primary, .text-button, .icon-button { display: flex; align-items: center; gap: var(--space-2); }
 .product { font-weight: 750; font-size: 21px; letter-spacing: -.012em; }
-.product-mark, .workspace-avatar, .profile-avatar { display: grid; place-items: center; flex: none; border-radius: var(--radius-sm); font-weight: 700; }
+.product-mark { display: grid; place-items: center; flex: none; border-radius: var(--radius-sm); font-weight: 700; }
 .product-mark { border-radius: var(--logo-radius); width: 34px; height: 34px; background: var(--accent); color: var(--accent-text); }
 .workspace-select {
   position: fixed;
@@ -44,7 +44,7 @@ h2 { font-size: 16px; letter-spacing: .005em; }
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-float);
 }
-.workspace-select .workspace-avatar { grid-row: span 2; width: 36px; height: 36px; }
+.workspace-select .workspace-avatar { grid-row: span 2; }
 .workspace-caption { grid-column: 2; color: var(--muted); font-size: 11px; }
 .workspace-name { grid-column: 2; font-size: 13px; font-weight: 650; }
 .workspace-select select { opacity: 0; position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -203,4 +203,4 @@ dialog .panel-heading { align-items: center; }
 .donut-key li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--space-2); padding: var(--space-1) 0; font-size: 12px; overflow-wrap: anywhere; }
 .chart-swatch { width: 9px; height: 9px; border-radius: 50%; }
 
-.profile .profile-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); }
+.profile-avatar, .workspace-avatar { flex: none; width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); }
