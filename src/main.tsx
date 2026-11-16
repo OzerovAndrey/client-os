@@ -58,7 +58,7 @@ function App() {
           <Icon size={18} />{name}
         </button>)}
       </nav>
-      <div className="profile"><span className="profile-avatar">AM</span><div><strong>Alex Morgan</strong><small>Demo workspace</small></div></div>
+      <div className="profile"><img className="profile-avatar" src={import.meta.env.BASE_URL + `avatars/${workspace.id}.jpg`} alt="" width={36} height={36} /><div><strong>Alex Morgan</strong><small>Demo workspace</small></div></div>
     </aside>
     <div className="body">
       <header className="topbar">
