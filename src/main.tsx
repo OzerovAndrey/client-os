@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { ArrowDownRight, ArrowRight, Building2, Check, ChevronDown, CircleDollarSign, ClipboardList, Columns3, LayoutDashboard, Menu, Moon, Plus, Search, Sun, Users, X } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, BarChart3, Building2, Check, ChevronDown, CircleDollarSign, ClipboardList, Columns3, LayoutDashboard, Menu, Moon, Plus, Search, Sun, Users, X } from 'lucide-react'
 import { crmKey, loadCRM, money, readLocal, stages, workspaces, writeLocal, type CRM, type Deal, type Stage, type Workspace } from './crm'
 import { createRoot } from 'react-dom/client'
+import { Analytics, BarChart } from './Analytics'
 import './tokens.css'
 import './styles.css'
 
@@ -11,12 +12,13 @@ const screens = [
   { name: 'Contacts', icon: Users },
   { name: 'Pipeline', icon: Columns3 },
   { name: 'Tasks', icon: ClipboardList },
+  { name: 'Analytics', icon: BarChart3 },
 ] as const
 type Screen = typeof screens[number]['name']
 type Editor = { kind: 'company' | 'contact' | 'deal' | 'task'; deal?: Deal }
 const screenTitles: Record<Screen, string> = {
   Overview: 'Workspace overview', Companies: 'Companies', Contacts: 'Contacts',
-  Pipeline: 'Sales pipeline', Tasks: 'Tasks',
+  Pipeline: 'Sales pipeline', Tasks: 'Tasks', Analytics: 'Sales analytics',
 }
 const descriptions: Record<Screen, string> = {
   Overview: 'Track deals, accounts, and follow-ups across your workspace.',
@@ -24,8 +26,9 @@ const descriptions: Record<Screen, string> = {
   Contacts: 'Find the people connected to your accounts.',
   Pipeline: 'Track opportunities from qualification to close.',
   Tasks: 'Keep your next steps in one place.',
+  Analytics: 'Compare deal stages and see which accounts drive pipeline and revenue.',
 }
-const editors: Record<Screen, Editor['kind']> = {
+const editors: Record<Exclude<Screen, 'Analytics'>, Editor['kind']> = {
   Overview: 'deal', Companies: 'company', Contacts: 'contact', Pipeline: 'deal', Tasks: 'task',
 }
 
@@ -80,6 +83,7 @@ function App() {
 
 function WorkspaceView({ workspace, screen, navigate }: { workspace: Workspace; screen: Screen; navigate: (screen: Screen) => void }) {
   const [data, setData] = useState(() => loadCRM(workspace))
+  const [accountId, setAccountId] = useState<string>()
   const [editor, setEditor] = useState<Editor>()
   const [searches, setSearches] = useState<Partial<Record<Screen, string>>>({})
   const query = searches[screen] ?? ''
@@ -142,9 +146,13 @@ function WorkspaceView({ workspace, screen, navigate }: { workspace: Workspace; 
     </label></li>)}</ul> : <p className="empty">{preview ? 'You’re caught up.' : 'No matching tasks.'}</p>
   }
   const totals = stages.map(stage => data.deals.filter(deal => deal.stage === stage).reduce((sum, deal) => sum + deal.amount, 0))
+  const openValue = totals.slice(0, -1).reduce((sum, value) => sum + value, 0)
+  const account = data.companies.find(company => company.id === accountId)
+  const accountContacts = data.contacts.filter(contact => contact.companyId === accountId)
+  const accountDeals = data.deals.filter(deal => deal.companyId === accountId)
   const openCount = data.deals.filter(deal => deal.stage !== 'Won').length
   const stats = [
-    { label: 'Open pipeline', value: money(totals.slice(0, 3).reduce((a, b) => a + b, 0)), detail: openCount + ' open opportunities', icon: CircleDollarSign },
+    { label: 'Open pipeline', value: money(openValue), detail: openCount + ' open opportunities', icon: CircleDollarSign },
     { label: 'Won revenue', value: money(totals[3]), detail: (data.deals.length - openCount) + ' closed deals', icon: Check },
     { label: 'Companies', value: data.companies.length, detail: data.contacts.length + ' linked contacts', icon: Building2 },
     { label: 'Open tasks', value: data.tasks.filter(task => !task.done).length, detail: data.tasks.filter(task => task.done).length + ' completed tasks', icon: ClipboardList },
@@ -153,18 +161,16 @@ function WorkspaceView({ workspace, screen, navigate }: { workspace: Workspace; 
   return <main>
     <div className="page-heading">
       <div><h1>{screenTitles[screen]}</h1><p>{descriptions[screen]}</p></div>
-      <button className="primary" onClick={() => setEditor({ kind: editors[screen] })}><Plus size={17} />New {editors[screen]}</button>
+      {screen !== 'Analytics' && <button className="primary" onClick={() => setEditor({ kind: editors[screen] })}><Plus size={17} />New {editors[screen]}</button>}
     </div>
     {persistenceError && <p role="status">Browser storage is unavailable. Changes will last until you leave this workspace.</p>}
-    {screen === 'Overview' ? <>
+    {screen === 'Analytics' ? <Analytics data={data} open={openValue} won={totals[3]} /> : screen === 'Overview' ? <>
       <div className="metrics">{stats.map(({ label, value, detail, icon: Icon }) => <section className="card metric" key={label}>
         <div className="metric-label"><span>{label}</span><Icon size={19} /></div><strong>{value}</strong><small>{detail}</small>
       </section>)}</div>
       <div className="overview-row">
-        <section className="card panel"><div className="panel-heading"><div><h2>Pipeline by stage</h2><p>Total deal value in USD</p></div><button className="text-button" onClick={() => navigate('Pipeline')}>View pipeline <ArrowRight size={15} /></button></div>
-          <div className="chart">{stages.map((stage, index) => <div className="bar-row" key={stage}>
-            <span>{stage}</span><div className="bar-track" aria-hidden="true"><div className={'bar stage-' + index} style={{ width: 100 * totals[index] / Math.max(1, ...totals) + '%' }} /></div><strong>{money(totals[index])}</strong>
-          </div>)}</div>
+        <section className="card panel"><div className="panel-heading"><div><h2>Pipeline by stage</h2><p>Total deal value in USD</p></div><button className="text-button" onClick={() => navigate('Analytics')}>View analytics <ArrowRight size={15} /></button></div>
+          <BarChart currency series={stages.map((stage, index) => ({ label: stage, value: totals[index] }))} />
         </section>
         <section className="card panel"><div className="panel-heading"><div><h2>Upcoming tasks</h2><p>Open follow-ups</p></div><button className="icon-button" aria-label="View all tasks" onClick={() => navigate('Tasks')}><ArrowDownRight size={19} /></button></div>{taskList(true)}</section>
       </div>
@@ -176,7 +182,7 @@ function WorkspaceView({ workspace, screen, navigate }: { workspace: Workspace; 
     </> : <>
       <label className="search"><Search size={17} /><input key={screen} type="search" aria-label={'Search ' + screen.toLowerCase()} placeholder={'Search ' + screen.toLowerCase() + '…'} value={query} onChange={event => setSearches({ ...searches, [screen]: event.target.value })} /></label>
       {screen === 'Companies' && <section className="card"><Table headings={['Company', 'Industry', 'Contacts']} rows={data.companies.filter(company => matches(company.name, company.industry)).map(company => ({
-        id: company.id, cells: [<strong>{company.name}</strong>, company.industry || '—', data.contacts.filter(contact => contact.companyId === company.id).length],
+        id: company.id, cells: [<button className="record-button" onClick={() => setAccountId(company.id)}>{company.name}</button>, company.industry || '—', data.contacts.filter(contact => contact.companyId === company.id).length],
       }))} /></section>}
       {screen === 'Contacts' && <section className="card"><Table headings={['Name', 'Company', 'Email']} rows={data.contacts.filter(contact => matches(contact.name, contact.email, companyName(contact.companyId))).map(contact => ({
         id: contact.id, cells: [<strong>{contact.name}</strong>, companyName(contact.companyId), contact.email],
@@ -209,6 +215,20 @@ function WorkspaceView({ workspace, screen, navigate }: { workspace: Workspace; 
         </section>
       })}</div>}
     </>}
+    {account && <Dialog title={account.name} close={() => setAccountId(undefined)}>
+      <p>{account.industry || 'Industry unspecified'}</p>
+      <section className="account-section">
+        <h2>Contacts <small>{accountContacts.length}</small></h2>
+        {accountContacts.length ? <ul>{accountContacts.map(contact => <li key={contact.id}><strong>{contact.name}</strong><span>{contact.email}</span></li>)}</ul> : <p>No linked contacts.</p>}
+      </section>
+      <section className="account-section">
+        <h2>Deals <small>{accountDeals.length}</small></h2>
+        {accountDeals.length ? <ul>{accountDeals.map(deal => <li key={deal.id}>
+          <button className="record-button" onClick={() => { setAccountId(undefined); setEditor({ kind: 'deal', deal }) }}>{deal.name}</button>
+          <span>{deal.stage} · {money(deal.amount)}</span>
+        </li>)}</ul> : <p>No linked deals.</p>}
+      </section>
+    </Dialog>}
     {editor && <EditorDialog title={(editor.deal ? 'Edit ' : 'New ') + editor.kind} close={() => setEditor(undefined)} save={save}>
       <label>Name<input name="name" required maxLength={100} defaultValue={editor.deal?.name} onInput={event => event.currentTarget.setCustomValidity('')} /></label>
       {editor.kind === 'company' && <label>Industry<input name="industry" maxLength={100} /></label>}
@@ -233,14 +253,24 @@ function Table({ headings, rows }: { headings: string[]; rows: { id: string; cel
 }
 
 function EditorDialog({ title, close, save, children }: { title: string; close: () => void; save: (event: FormEvent<HTMLFormElement>) => void; children: ReactNode }) {
-  const dialog = useRef<HTMLDialogElement>(null)
-  useEffect(() => { dialog.current?.showModal() }, [])
-  return <dialog ref={dialog} aria-labelledby="editor-title" onCancel={event => { event.preventDefault(); close() }}>
+  return <Dialog title={title} close={close}>
     <form onSubmit={save}>
-      <div className="panel-heading"><h2 id="editor-title">{title}</h2><button type="button" className="icon-button" aria-label="Close" onClick={close}><X size={19} /></button></div>
       <div className="fields">{children}</div>
       <div className="actions"><button type="button" className="secondary" onClick={close}>Cancel</button><button className="primary" type="submit">Save</button></div>
     </form>
+  </Dialog>
+}
+
+function Dialog({ title, close, children }: { title: string; close: () => void; children: ReactNode }) {
+  const dialog = useRef<HTMLDialogElement>(null)
+  useEffect(() => {
+    const element = dialog.current
+    element?.showModal()
+    return () => element?.close()
+  }, [])
+  return <dialog ref={dialog} aria-labelledby="dialog-title" onCancel={event => { event.preventDefault(); close() }}>
+    <div className="panel-heading"><h2 id="dialog-title">{title}</h2><button type="button" className="icon-button" aria-label="Close" onClick={close}><X size={19} /></button></div>
+    {children}
   </dialog>
 }
 
