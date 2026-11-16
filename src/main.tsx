@@ -45,16 +45,6 @@ function App() {
   return <div className="shell">
     <aside className={menu ? 'sidebar expanded' : 'sidebar'} id="sidebar">
       <div className="product"><span className="product-mark"><Columns3 size={21} /></span>ClientOS</div>
-      <label className="workspace-select">
-        <span className="workspace-avatar">{workspace.initials}</span>
-        <select aria-label="Workspace" value={workspace.id} onChange={event => {
-          setWorkspace(workspaces.find(item => item.id === event.target.value) ?? workspaces[0])
-          setMenu(false)
-        }}>
-          {workspaces.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
-        </select>
-        <ChevronDown size={15} />
-      </label>
       <nav aria-label="Workspace navigation">
         <span className="nav-heading">Workspace</span>
         {screens.map(({ name, icon: Icon }) => <button key={name} aria-current={screen === name ? 'page' : undefined} onClick={() => { setScreen(name); setMenu(false) }}>
@@ -73,6 +63,18 @@ function App() {
       </header>
       <WorkspaceView key={workspace.id} workspace={workspace} screen={screen} navigate={setScreen} />
     </div>
+    <label className="workspace-select">
+      <span className="workspace-avatar">{workspace.initials}</span>
+      <span className="workspace-caption">Demo brand</span>
+      <span className="workspace-name" aria-hidden="true">{workspace.name}</span>
+      <select aria-label="Workspace" value={workspace.id} onChange={event => {
+        setWorkspace(workspaces.find(item => item.id === event.target.value) ?? workspaces[0])
+        setMenu(false)
+      }}>
+        {workspaces.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+      </select>
+      <ChevronDown size={15} />
+    </label>
   </div>
 }
 
