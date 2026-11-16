@@ -2,20 +2,49 @@ import { money, stages, type CRM } from './crm'
 
 type Series = { label: string; value: number }
 
-export function BarChart({ series, currency = false }: { series: Series[]; currency?: boolean }) {
+export type ChartVariant = 'columns' | 'donut' | 'bars'
+
+const chartColors = ['--accent', '--stage-proposal', '--stage-negotiation', '--stage-won', '--chart-extra']
+
+export function BrandChart({ series, currency = false, variant }: { series: Series[]; currency?: boolean; variant: ChartVariant }) {
   const max = Math.max(1, ...series.map(item => item.value))
-  return <div className="column-chart">
+  const total = series.reduce((sum, item) => sum + item.value, 0)
+  const format = (value: number) => currency ? money(value) : value
+
+  if (variant === 'donut') {
+    let cumulative = 0
+    const segments = series.flatMap(({ value }, index) => {
+      if (!value) return []
+      const start = 100 * cumulative / total
+      cumulative += value
+      return [`var(${chartColors[index]}) ${start}% ${100 * cumulative / total}%`]
+    })
+    return <div className="donut-chart" data-chart={variant}>
+      <div className="donut-ring" style={{ background: total ? `conic-gradient(${segments.join(', ')})` : 'var(--subtle)' }}>
+        <div className="donut-center"><strong>{format(total)}</strong><span>Total</span></div>
+      </div>
+      <ul className="donut-key">{series.map(({ label, value }, index) => <li key={label}>
+        <span className="chart-swatch" aria-hidden="true" style={{ background: `var(${chartColors[index]})` }} />
+        <span>{label}</span><strong>{format(value)}</strong>
+      </li>)}</ul>
+    </div>
+  }
+
+  return <div className={variant === 'columns' ? 'column-chart' : 'horizontal-chart'} data-chart={variant}>
     {series.map(({ label, value }, index) => <div className="column-item" key={label}>
       <div className="column-track" aria-hidden="true">
-        <div className={'column-fill stage-' + index % stages.length} style={{ height: 100 * value / max + '%' }} />
+        <div className="column-fill" style={{
+          background: `var(${chartColors[index]})`,
+          ...(variant === 'columns' ? { height: 100 * value / max + '%' } : { width: 100 * value / max + '%' }),
+        }} />
       </div>
-      <strong>{currency ? money(value) : value}</strong>
+      <strong>{format(value)}</strong>
       <span>{label}</span>
     </div>)}
   </div>
 }
 
-export function Analytics({ data, open, won }: { data: CRM; open: number; won: number }) {
+export function Analytics({ data, open, won, variant }: { data: CRM; open: number; won: number; variant: ChartVariant }) {
   const accounts = data.companies.map(company => {
     const deals = data.deals.filter(deal => deal.companyId === company.id)
     return { ...company, deals: deals.length, open: deals.filter(deal => deal.stage !== 'Won').reduce((sum, deal) => sum + deal.amount, 0), won: deals.filter(deal => deal.stage === 'Won').reduce((sum, deal) => sum + deal.amount, 0) }
@@ -32,10 +61,10 @@ export function Analytics({ data, open, won }: { data: CRM; open: number; won: n
     </div>
     <div className="overview-row">
       <section className="card panel"><h2>Open value by account</h2><p>Top five companies by active pipeline</p>
-        <BarChart currency series={accounts.slice(0, 5).map(account => ({ label: account.name, value: account.open }))} />
+        <BrandChart variant={variant} currency series={accounts.slice(0, 5).map(account => ({ label: account.name, value: account.open }))} />
       </section>
       <section className="card panel"><h2>Deal count by stage</h2><p>All opportunities in this workspace</p>
-        <BarChart series={stages.map(stage => ({ label: stage, value: data.deals.filter(deal => deal.stage === stage).length }))} />
+        <BrandChart variant={variant} series={stages.map(stage => ({ label: stage, value: data.deals.filter(deal => deal.stage === stage).length }))} />
       </section>
     </div>
     <section className="card">

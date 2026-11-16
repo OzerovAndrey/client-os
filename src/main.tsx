@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { ArrowDownRight, ArrowRight, BarChart3, Building2, Check, ChevronDown, CircleDollarSign, ClipboardList, Columns3, LayoutDashboard, Menu, Moon, Plus, Search, Sun, Users, X } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, BarChart3, Building2, Check, ChevronDown, CircleDollarSign, ClipboardList, Columns3, Landmark, Orbit, Sparkles, LayoutDashboard, Menu, Moon, Plus, Search, Sun, Users, X } from 'lucide-react'
 import { crmKey, loadCRM, money, readLocal, stages, workspaces, writeLocal, type CRM, type Deal, type Stage, type Workspace } from './crm'
 import { createRoot } from 'react-dom/client'
-import { Analytics, BarChart } from './Analytics'
+import { Analytics, BrandChart } from './Analytics'
 import './tokens.css'
 import './styles.css'
 
@@ -32,11 +32,15 @@ const editors: Record<Exclude<Screen, 'Analytics'>, Editor['kind']> = {
   Overview: 'deal', Companies: 'company', Contacts: 'contact', Pipeline: 'deal', Tasks: 'task',
 }
 
+const brandMarks = { atlas: Orbit, studio: Sparkles, meridian: Landmark }
+const brandCharts = { atlas: 'columns', studio: 'donut', meridian: 'bars' } as const
+
 function App() {
   const [workspace, setWorkspace] = useState(() => workspaces.find(item => item.id === readLocal<string>('workspace', 'atlas')) ?? workspaces[0])
   const [theme, setTheme] = useState(() => readLocal<string>('theme', 'light') === 'dark' ? 'dark' : 'light')
   const [screen, setScreen] = useState<Screen>('Overview')
   const [menu, setMenu] = useState(false)
+  const BrandMark = brandMarks[workspace.id]
 
   useEffect(() => {
     document.documentElement.dataset.brand = workspace.id
@@ -47,7 +51,7 @@ function App() {
 
   return <div className="shell">
     <aside className={menu ? 'sidebar expanded' : 'sidebar'} id="sidebar">
-      <div className="product"><span className="product-mark"><Columns3 size={21} /></span>ClientOS</div>
+      <div className="product"><span className="product-mark"><BrandMark size={21} aria-hidden="true" /></span>ClientOS</div>
       <nav aria-label="Workspace navigation">
         <span className="nav-heading">Workspace</span>
         {screens.map(({ name, icon: Icon }) => <button key={name} aria-current={screen === name ? 'page' : undefined} onClick={() => { setScreen(name); setMenu(false) }}>
@@ -164,13 +168,13 @@ function WorkspaceView({ workspace, screen, navigate }: { workspace: Workspace; 
       {screen !== 'Analytics' && <button className="primary" onClick={() => setEditor({ kind: editors[screen] })}><Plus size={17} />New {editors[screen]}</button>}
     </div>
     {persistenceError && <p role="status">Browser storage is unavailable. Changes will last until you leave this workspace.</p>}
-    {screen === 'Analytics' ? <Analytics data={data} open={openValue} won={totals[3]} /> : screen === 'Overview' ? <>
+    {screen === 'Analytics' ? <Analytics variant={brandCharts[workspace.id]} data={data} open={openValue} won={totals[3]} /> : screen === 'Overview' ? <>
       <div className="metrics">{stats.map(({ label, value, detail, icon: Icon }) => <section className="card metric" key={label}>
         <div className="metric-label"><span>{label}</span><Icon size={19} /></div><strong>{value}</strong><small>{detail}</small>
       </section>)}</div>
       <div className="overview-row">
         <section className="card panel"><div className="panel-heading"><div><h2>Pipeline by stage</h2><p>Total deal value in USD</p></div><button className="text-button" onClick={() => navigate('Analytics')}>View analytics <ArrowRight size={15} /></button></div>
-          <BarChart currency series={stages.map((stage, index) => ({ label: stage, value: totals[index] }))} />
+          <BrandChart variant={brandCharts[workspace.id]} currency series={stages.map((stage, index) => ({ label: stage, value: totals[index] }))} />
         </section>
         <section className="card panel"><div className="panel-heading"><div><h2>Upcoming tasks</h2><p>Open follow-ups</p></div><button className="icon-button" aria-label="View all tasks" onClick={() => navigate('Tasks')}><ArrowDownRight size={19} /></button></div>{taskList(true)}</section>
       </div>

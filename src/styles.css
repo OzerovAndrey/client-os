@@ -5,6 +5,7 @@ button, select { cursor: pointer; }
 button { border: 0; background: transparent; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 h1, h2, p { margin: 0; }
+h1, h2, .product { font-family: var(--font-heading); }
 p, small { color: var(--muted); }
 h2 { font-size: 16px; letter-spacing: .005em; }
 .shell {
@@ -25,7 +26,7 @@ h2 { font-size: 16px; letter-spacing: .005em; }
 .product, .profile, .workspace-select, .sidebar button, .topbar, .primary, .text-button, .icon-button { display: flex; align-items: center; gap: var(--space-2); }
 .product { font-weight: 750; font-size: 21px; letter-spacing: -.012em; }
 .product-mark, .workspace-avatar, .profile-avatar { display: grid; place-items: center; flex: none; border-radius: var(--radius-sm); font-weight: 700; }
-.product-mark { width: 34px; height: 34px; background: var(--accent); color: var(--accent-text); }
+.product-mark { border-radius: var(--logo-radius); width: 34px; height: 34px; background: var(--accent); color: var(--accent-text); }
 .workspace-select {
   position: fixed;
   z-index: 1;
@@ -153,17 +154,17 @@ dialog .panel-heading { align-items: center; }
   gap: var(--space-2);
   margin-top: var(--space-5);
 }
-.column-item { display: grid; grid-template-rows: 145px auto 1fr; gap: var(--space-1); text-align: center; min-width: 0; }
+.column-chart .column-item { display: grid; grid-template-rows: 145px auto 1fr; gap: var(--space-1); text-align: center; min-width: 0; }
 .column-item strong, .column-item span { overflow-wrap: anywhere; font-size: 12px; }
 .column-item span { color: var(--muted); }
-.column-track {
+.column-chart .column-track {
   display: flex;
   align-items: flex-end;
   justify-content: center;
   border-bottom: 1px solid var(--line);
   background: repeating-linear-gradient(to top, transparent 0, transparent calc(25% - 1px), var(--line) calc(25% - 1px), var(--line) 25%);
 }
-.column-fill { width: min(60%, 64px); background: linear-gradient(to top, color-mix(in srgb, var(--stage-color) 66%, var(--surface)), var(--stage-color)); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.column-chart .column-fill { width: min(60%, 64px); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
 .account-section { margin-top: var(--space-5); }
 .account-section ul { list-style: none; padding: 0; margin: var(--space-2) 0 0; }
 .account-section li { display: grid; gap: var(--space-1); border-top: 1px solid var(--line); padding-block: var(--space-2); }
@@ -171,5 +172,19 @@ dialog .panel-heading { align-items: center; }
 @media (max-width: 480px) {
   .panel { padding: var(--space-4); }
   .panel-heading .text-button { font-size: 12px; }
-  .column-item { grid-template-rows: 112px auto 1fr; }
+  .column-chart .column-item { grid-template-rows: 112px auto 1fr; }
 }
+
+.horizontal-chart { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+.horizontal-chart .column-item { display: grid; grid-template-columns: minmax(64px, 1fr) minmax(36px, 2fr) auto; gap: var(--space-2); align-items: center; }
+.horizontal-chart .column-item span { grid-area: 1 / 1; }
+.horizontal-chart .column-track, .horizontal-chart .column-fill { height: 12px; border-radius: var(--radius-sm); }
+.horizontal-chart .column-track { background: var(--subtle); }
+
+.donut-chart { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-4); margin-top: var(--space-5); }
+.donut-ring { width: 142px; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; }
+.donut-center { width: 75%; aspect-ratio: 1; border-radius: 50%; background: var(--surface); display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.donut-center span { color: var(--muted); font-size: 12px; }
+.donut-key { list-style: none; padding: 0; margin: 0; flex: 1 1 165px; min-width: 0; }
+.donut-key li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--space-2); padding: var(--space-1) 0; font-size: 12px; overflow-wrap: anywhere; }
+.chart-swatch { width: 9px; height: 9px; border-radius: 50%; }

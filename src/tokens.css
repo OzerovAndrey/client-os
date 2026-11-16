@@ -24,7 +24,6 @@
   --radius-sm: .5rem;
   --radius-md: .75rem;
   --radius-lg: 1rem;
-  --font-body: "Inter", system-ui, sans-serif;
 
   --brand-light: var(--blue-700);
   --brand-dark: var(--blue-300);
@@ -46,8 +45,6 @@
   --scrim: #10152944;
   --brand-glow: color-mix(in srgb, var(--accent) 8%, transparent);
   --accent-soft: color-mix(in srgb, var(--accent) 10%, var(--surface));
-  --button-bg: var(--accent);
-  --button-fg: var(--accent-text);
   --card-radius: var(--radius-lg);
   color-scheme: light;
 }
@@ -123,3 +120,36 @@
   --line: #39534c;
   --ambient: radial-gradient(ellipse at 0 100%, #1f4c3f, transparent 65%);
 }
+
+:root {
+  --font-body: system-ui, sans-serif;
+  --font-heading: var(--font-body);
+  --logo-radius: 11px;
+  --button-bg: #3448c5;
+  --button-fg: #fff;
+  --chart-extra: #5c79a8;
+}
+
+[data-brand="studio"] {
+  --font-body: "Avenir Next", "Century Gothic", "Trebuchet MS", sans-serif;
+  --radius-sm: .85rem;
+  --radius-md: 1.15rem;
+  --radius-lg: 1.5rem;
+  --logo-radius: 50%;
+  --button-bg: #9e245f;
+  --chart-extra: #567b95;
+}
+
+[data-brand="meridian"] {
+  --font-body: Georgia, "Times New Roman", serif;
+  --radius-sm: .3rem;
+  --radius-md: .5rem;
+  --radius-lg: .75rem;
+  --logo-radius: 4px;
+  --button-bg: #15573d;
+  --chart-extra: #586d9e;
+}
+
+[data-theme="dark"] { --button-bg: #b8c1ff; --button-fg: #141b42; }
+[data-brand="studio"][data-theme="dark"] { --button-bg: #f5a6ce; --button-fg: #431331; }
+[data-brand="meridian"][data-theme="dark"] { --button-bg: #a2e4ae; --button-fg: #123722; }
