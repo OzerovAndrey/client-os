@@ -1,0 +1,61 @@
+:root {
+  --blue-700: #3448c5;
+  --blue-300: #a5b4fc;
+  --violet-700: #7a2ca2;
+  --violet-300: #e3a9fa;
+  --teal-700: #087466;
+  --teal-300: #75dfca;
+  --slate-950: #101529;
+  --slate-900: #191e32;
+  --slate-800: #252c43;
+  --slate-700: #39435c;
+  --slate-300: #aeb8ce;
+  --slate-100: #f0f2f8;
+  --slate-50: #f7f8fc;
+  --white: #fff;
+
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --radius-sm: .5rem;
+  --radius-md: .75rem;
+  --radius-lg: 1rem;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  --brand-light: var(--blue-700);
+  --brand-dark: var(--blue-300);
+  --canvas: var(--slate-50);
+  --surface: var(--white);
+  --subtle: var(--slate-100);
+  --text: var(--slate-950);
+  --muted: #58647c;
+  --line: #e1e5ef;
+  --accent: var(--brand-light);
+  --accent-text: var(--white);
+  --stage-proposal: #8864d6;
+  --stage-negotiation: #bb7525;
+  --stage-won: #26866d;
+  --shadow: 0 1px 2px #10152908;
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  --button-bg: var(--accent);
+  --button-fg: var(--accent-text);
+  --card-radius: var(--radius-md);
+  color-scheme: light;
+}
+[data-brand="studio"] { --brand-light: var(--violet-700); --brand-dark: var(--violet-300); }
+[data-brand="meridian"] { --brand-light: var(--teal-700); --brand-dark: var(--teal-300); }
+[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: var(--slate-950);
+  --surface: var(--slate-900);
+  --subtle: var(--slate-800);
+  --text: var(--slate-50);
+  --muted: var(--slate-300);
+  --line: var(--slate-700);
+  --accent: var(--brand-dark);
+  --accent-text: var(--slate-950);
+}
