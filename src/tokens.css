@@ -153,3 +153,7 @@
 [data-theme="dark"] { --button-bg: #b8c1ff; --button-fg: #141b42; }
 [data-brand="studio"][data-theme="dark"] { --button-bg: #f5a6ce; --button-fg: #431331; }
 [data-brand="meridian"][data-theme="dark"] { --button-bg: #a2e4ae; --button-fg: #123722; }
+
+:root { --spotlight-start: #354fce; --spotlight-end: #171f63; }
+[data-brand="studio"] { --spotlight-start: #9b347b; --spotlight-end: #421b59; }
+[data-brand="meridian"] { --spotlight-start: #19735e; --spotlight-end: #123d38; }

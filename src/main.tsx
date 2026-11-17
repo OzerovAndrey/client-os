@@ -52,7 +52,7 @@ function App() {
 
   return <div className="shell">
     <aside className={menu ? 'sidebar expanded' : 'sidebar'} id="sidebar">
-      <div className="product"><span className="product-mark"><BrandMark size={21} aria-hidden="true" /></span>ClientOS</div>
+      <div className="product" aria-label="ClientOS"><span className="product-mark"><BrandMark size={21} aria-hidden="true" /></span><span className="wordmark">ClientOS</span></div>
       <nav aria-label="Workspace navigation">
         <span className="nav-heading">Workspace</span>
         {screens.map(({ name, icon: Icon }) => <button key={name} aria-current={screen === name ? 'page' : undefined} onClick={() => { setScreen(name); setMenu(false) }}>
@@ -156,6 +156,7 @@ function WorkspaceView({ workspace, screen, navigate }: { workspace: Workspace; 
   const accountContacts = data.contacts.filter(contact => contact.companyId === accountId)
   const accountDeals = data.deals.filter(deal => deal.companyId === accountId)
   const openCount = data.deals.filter(deal => deal.stage !== 'Won').length
+  const featuredDeal = data.deals.filter(deal => deal.stage !== 'Won').reduce<Deal | undefined>((largest, deal) => !largest || deal.amount > largest.amount ? deal : largest, undefined)
   const stats = [
     { label: 'Open pipeline', value: money(openValue), detail: openCount + ' open opportunities', icon: CircleDollarSign },
     { label: 'Won revenue', value: money(totals[3]), detail: (data.deals.length - openCount) + ' closed deals', icon: Check },
@@ -164,26 +165,37 @@ function WorkspaceView({ workspace, screen, navigate }: { workspace: Workspace; 
   ]
 
   return <main>
-    <div className="page-heading">
-      <div><h1>{screenTitles[screen]}</h1><p>{descriptions[screen]}</p></div>
+    <div className={screen === 'Overview' ? 'page-heading overview-heading' : 'page-heading'}>
+      <div><h1>{screen === 'Overview' ? 'Welcome back, Alex' : screenTitles[screen]}</h1><p>{screen === 'Overview' ? workspace.name + ' · Sales overview' : descriptions[screen]}</p></div>
       {screen !== 'Analytics' && <button className="primary" onClick={() => setEditor({ kind: editors[screen] })}><Plus size={17} />New {editors[screen]}</button>}
     </div>
     {persistenceError && <p role="status">Browser storage is unavailable. Changes will last until you leave this workspace.</p>}
     {screen === 'Analytics' ? <Analytics variant={brandCharts[workspace.id]} data={data} open={openValue} won={totals[3]} /> : screen === 'Overview' ? <>
-      <div className="metrics">{stats.map(({ label, value, detail, icon: Icon }) => <section className="card metric" key={label}>
+      <div className="metrics overview-metrics">{stats.map(({ label, value, detail, icon: Icon }) => <section className="card metric" key={label}>
         <div className="metric-label"><span>{label}</span><Icon size={19} /></div><strong>{value}</strong><small>{detail}</small>
       </section>)}</div>
-      <div className="overview-row">
+      <div className="dashboard-grid">
+        <div className="dashboard-stack">
         <section className="card panel"><div className="panel-heading"><div><h2>Pipeline by stage</h2><p>Total deal value in USD</p></div><button className="text-button" onClick={() => navigate('Analytics')}>View analytics <ArrowRight size={15} /></button></div>
           <BrandChart variant={brandCharts[workspace.id]} currency series={stages.map((stage, index) => ({ label: stage, value: totals[index] }))} />
         </section>
-        <section className="card panel"><div className="panel-heading"><div><h2>Upcoming tasks</h2><p>Open follow-ups</p></div><button className="icon-button" aria-label="View all tasks" onClick={() => navigate('Tasks')}><ArrowDownRight size={19} /></button></div>{taskList(true)}</section>
-      </div>
       <section className="card"><div className="panel-heading table-heading"><div><h2>Recent deals</h2><p>Latest opportunities in this workspace</p></div><button className="text-button" onClick={() => navigate('Pipeline')}>View all <ArrowRight size={15} /></button></div>
-        <Table headings={['Deal', 'Company', 'Stage', 'Value']} rows={data.deals.slice(-4).reverse().map(deal => ({
-          id: deal.id, cells: [<button className="record-button" onClick={() => setEditor({ kind: 'deal', deal })}>{deal.name}</button>, companyName(deal.companyId), <span className="badge">{deal.stage}</span>, money(deal.amount)],
+        <Table headings={['Deal', 'Company', 'Stage', 'Value']} rows={data.deals.slice(-6).reverse().map(deal => ({
+          id: deal.id, cells: [<button className="record-button" onClick={() => setEditor({ kind: 'deal', deal })}>{deal.name}</button>, companyName(deal.companyId), <span className={'badge stage-' + stages.indexOf(deal.stage)}><span className="dot" />{deal.stage}</span>, money(deal.amount)],
         }))} />
       </section>
+        </div>
+        <div className="dashboard-stack">
+          {featuredDeal && <section className="card panel deal-spotlight">
+            <div className="spotlight-label"><Sparkles size={15} /> Top open opportunity</div>
+            <h2>{featuredDeal.name}</h2>
+            <p>{companyName(featuredDeal.companyId)} · {featuredDeal.stage}</p>
+            <strong>{money(featuredDeal.amount)}</strong>
+            <button className="spotlight-action" onClick={() => setEditor({ kind: 'deal', deal: featuredDeal })}>Open deal <ArrowRight size={16} /></button>
+          </section>}
+        <section className="card panel"><div className="panel-heading"><div><h2>Upcoming tasks</h2><p>Open follow-ups</p></div><button className="icon-button" aria-label="View all tasks" onClick={() => navigate('Tasks')}><ArrowDownRight size={19} /></button></div>{taskList(true)}</section>
+        </div>
+      </div>
     </> : <>
       <label className="search"><Search size={17} /><input key={screen} type="search" aria-label={'Search ' + screen.toLowerCase()} placeholder={'Search ' + screen.toLowerCase() + '…'} value={query} onChange={event => setSearches({ ...searches, [screen]: event.target.value })} /></label>
       {screen === 'Companies' && <section className="card"><Table headings={['Company', 'Industry', 'Contacts']} rows={data.companies.filter(company => matches(company.name, company.industry)).map(company => ({
