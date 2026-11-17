@@ -153,7 +153,11 @@ dialog .panel-heading { align-items: center; }
   .topbar { padding-inline: var(--space-4); }
   .menu-toggle { display: flex; }
   main { padding: var(--space-5) var(--space-4) 7rem; }
-  .workspace-select { right: max(var(--space-4), env(safe-area-inset-right)); bottom: max(var(--space-4), env(safe-area-inset-bottom)); }
+  .workspace-select {
+    position: absolute;
+    right: max(var(--space-3), env(safe-area-inset-right));
+    bottom: max(var(--space-3), env(safe-area-inset-bottom));
+  }
   .page-heading { flex-wrap: wrap; }
   th, td { padding-inline: var(--space-3); }
 }
