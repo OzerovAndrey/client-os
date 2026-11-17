@@ -1,5 +1,6 @@
 * { box-sizing: border-box; }
 body { margin: 0; color: var(--text); background: var(--ambient), var(--outside); font: 14px/1.5 var(--font-body); }
+#root { display: flow-root; }
 button, input, select { font: inherit; color: inherit; }
 button, select { cursor: pointer; }
 button { border: 0; background: transparent; }
@@ -10,19 +11,21 @@ p, small { color: var(--muted); }
 h2 { font-size: 16px; letter-spacing: .005em; }
 .shell {
   width: min(1440px, calc(100% - 3rem));
-  min-height: calc(100dvh - 5rem);
+  --topbar-height: 65px;
+  position: relative;
+  height: calc(100dvh - 5rem);
   margin: var(--space-8) auto 3rem;
   display: grid;
-  grid-template-columns: 234px minmax(0, 1fr);
+  grid-template: minmax(0, 1fr) / 234px minmax(0, 1fr);
   border: 1px solid var(--line);
   border-radius: var(--shell-radius);
   background: var(--canvas);
   box-shadow: var(--shadow-float);
 }
-.body { min-width: 0; }
+.body { min-width: 0; min-height: 0; height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .shell > .sidebar { border-radius: var(--shell-radius) 0 0 var(--shell-radius); }
 .shell .topbar { border-radius: 0 var(--shell-radius) 0 0; }
-.sidebar { position: sticky; top: var(--space-8); height: calc(100dvh - 5rem); min-height: min(450px, calc(100dvh - 5rem)); overflow: auto; background: var(--navigation); border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: var(--space-5); gap: var(--space-8); }
+.sidebar { min-height: 0; overflow: auto; background: var(--navigation); border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: var(--space-5); gap: var(--space-8); }
 .product, .profile, .workspace-select, .sidebar button, .topbar, .primary, .text-button, .icon-button { display: flex; align-items: center; gap: var(--space-2); }
 .product { font-weight: 750; font-size: 21px; letter-spacing: -.012em; }
 .product-mark { display: grid; place-items: center; flex: none; border-radius: var(--radius-sm); font-weight: 700; }
@@ -58,7 +61,7 @@ select option { background: var(--surface); color: var(--text); }
 .sidebar button[aria-current] { color: var(--accent); background: var(--nav-active); font-weight: 650; }
 .profile { margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--line); }
 .profile strong, .profile small { display: block; }
-.topbar { min-height: 65px; padding: 0 var(--space-8); background: var(--glass); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--line); }
+.topbar { min-height: var(--topbar-height); padding: 0 var(--space-8); background: var(--glass); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--line); }
 .breadcrumb { color: var(--muted); }
 .breadcrumb span { margin-inline: var(--space-2); }
 .breadcrumb strong { color: var(--text); font-weight: 600; }
@@ -66,7 +69,7 @@ select option { background: var(--surface); color: var(--text); }
 .icon-button:hover, .secondary:hover { background: var(--subtle); }
 .theme-toggle { margin-left: auto; }
 .menu-toggle { display: none; }
-main { max-width: 1520px; margin: auto; padding: var(--space-8) var(--space-8) 7rem; }
+main { min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: var(--space-8) var(--space-8) 7rem; }
 .page-heading, .panel-heading, .metric-label { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); }
 .page-heading { margin-bottom: var(--space-8); }
 h1 { font-size: clamp(24px, 3vw, 34px); line-height: 1.15; letter-spacing: -.012em; margin-bottom: var(--space-2); }
@@ -143,11 +146,11 @@ dialog .panel-heading { align-items: center; }
   .overview-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
-  .shell { display: block; width: calc(100% - 1rem); margin: var(--space-2) auto var(--space-6); }
+  .shell { --topbar-height: 59px; display: block; width: calc(100% - 1rem); height: calc(100dvh - 1rem); margin: var(--space-2) auto; }
   .shell .topbar { border-radius: var(--shell-radius) var(--shell-radius) 0 0; }
-  .sidebar { display: none; min-height: 0; position: fixed; top: 68px; bottom: 0; left: var(--space-2); height: auto; width: 234px; z-index: 2; overflow: auto; }
+  .sidebar { display: none; min-height: 0; position: absolute; top: var(--topbar-height); bottom: 0; left: 0; width: 234px; z-index: 2; overflow: auto; }
   .sidebar.expanded { display: flex; }
-  .topbar { position: sticky; top: 0; z-index: 3; min-height: 59px; padding-inline: var(--space-4); }
+  .topbar { padding-inline: var(--space-4); }
   .menu-toggle { display: flex; }
   main { padding: var(--space-5) var(--space-4) 7rem; }
   .workspace-select { right: max(var(--space-4), env(safe-area-inset-right)); bottom: max(var(--space-4), env(safe-area-inset-bottom)); }

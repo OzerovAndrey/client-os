@@ -164,7 +164,7 @@ function WorkspaceView({ workspace, screen, navigate }: { workspace: Workspace; 
     { label: 'Open tasks', value: data.tasks.filter(task => !task.done).length, detail: data.tasks.filter(task => task.done).length + ' completed tasks', icon: ClipboardList },
   ]
 
-  return <main>
+  return <main key={screen} tabIndex={0} aria-label={screenTitles[screen]}>
     <div className={screen === 'Overview' ? 'page-heading overview-heading' : 'page-heading'}>
       <div><h1>{screen === 'Overview' ? 'Welcome back, Alex' : screenTitles[screen]}</h1><p>{screen === 'Overview' ? workspace.name + ' · Sales overview' : descriptions[screen]}</p></div>
       {screen !== 'Analytics' && <button className="primary" onClick={() => setEditor({ kind: editors[screen] })}><Plus size={17} />New {editors[screen]}</button>}
